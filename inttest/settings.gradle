@@ -1,0 +1,9 @@
+// forked project
+rootProject.name = 'sprinttest'
+
+rootDir.eachDir { dir ->
+    if (dir.name.startsWith('spring-integration-')) {
+        include ":${dir.name}"
+    }
+}
+

@@ -1,0 +1,13 @@
+// forked project
+rootProject.name = 'springlab'
+
+include ':spring-integration', ':inttest'
+new File('spring-integration').eachDir { dir ->
+    if (dir.name.startsWith('spring-integration-')) {
+        include "spring-integration:${dir.name}"
+        //project(":${dir.name}").projectDir = new File("spring-integration/${dir.name}")
+    }
+}
+
+project(':inttest').projectDir = new File('inttest')
+

@@ -1,0 +1,115 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'org.rbd'
+version = '0.0.1-SNAPSHOT'
+
+description = "inttest"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+ext {
+    springVersion = "5.1.0.RC3"
+    springBootVersion = "2.1.0.M2"
+}
+
+allprojects {
+	group = 'org.springframework.integration'
+
+	repositories {
+		maven { url 'https://repo.spring.io/libs-milestone' }
+		if (version.endsWith('BUILD-SNAPSHOT')) {
+			maven { url 'https://repo.spring.io/libs-snapshot' }
+		}
+//		maven { url 'https://repo.spring.io/libs-staging-local' }
+	}
+
+	ext.javadocLinks = [
+		'http://docs.oracle.com/javase/7/docs/api/',
+		'http://docs.oracle.com/javaee/6/api/',
+		'http://docs.spring.io/spring/docs/current/javadoc-api/',
+		'http://docs.spring.io/spring-amqp/docs/current/api/',
+		'http://docs.spring.io/spring-data-gemfire/docs/current/api/',
+		'http://docs.spring.io/spring-data/data-mongo/docs/current/api/',
+		'http://docs.spring.io/spring-data/data-redis/docs/current/api/',
+		'http://docs.spring.io/spring-ws/sites/2.0/apidocs/'
+	] as String[]
+
+}
+project('spring-integration-core') {
+    description = 'Spring Integration Core'
+
+    dependencies {
+        compile "org.springframework:spring-core:$springVersion"
+        compile "org.springframework:spring-aop:$springVersion"
+        compile "org.springframework:spring-context:$springVersion"
+        compile "org.springframework:spring-messaging:$springVersion"
+        compile "org.springframework:spring-tx:$springVersion"
+        compile ("org.springframework.retry:spring-retry:$springRetryVersion") {
+            exclude group: 'org.springframework', module: 'spring-core'
+        }
+        compile "io.projectreactor:reactor-core:$reactorVersion"
+        compile("com.fasterxml.jackson.core:jackson-databind:$jackson2Version", optional)
+        compile("com.jayway.jsonpath:json-path:$jsonpathVersion", optional)
+        compile("io.fastjson:boon:$boonVersion", optional)
+        compile("com.esotericsoftware:kryo-shaded:$kryoShadedVersion", optional)
+        compile("io.micrometer:micrometer-core:$micrometerVersion", optional)
+
+        testCompile ("org.aspectj:aspectjweaver:$aspectjVersion")
+        testCompile "io.projectreactor:reactor-test:$reactorVersion"
+        testCompile ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson2Version")
+    }
+}
+
+
+project('spring-integration-file') {
+    description = 'Spring Integration File Support'
+    dependencies {
+        compile project(":spring-integration-core")
+        compile "commons-io:commons-io:$commonsIoVersion"
+
+        testCompile project(":spring-integration-redis")
+        testCompile project(":spring-integration-redis").sourceSets.test.output
+        testCompile project(":spring-integration-gemfire")
+        testCompile project(":spring-integration-jdbc")
+        testCompile "com.h2database:h2:$h2Version"
+        testCompile "io.lettuce:lettuce-core:$lettuceVersion"
+        testCompile "io.projectreactor:reactor-test:$reactorVersion"
+    }
+}
+
+dependencies {
+    compile "io.projectreactor:reactor-core:3.1.2.RELEASE"
+    compile "org.slf4j:slf4j-api:1.6.6"
+    compile "org.slf4j:slf4j-simple:1.6.6"
+
+    compile "org.springframework.boot:spring-boot-starter-ws:$springBootVersion"
+    compile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+
+    /*
+    compile "org.springframework.boot:spring-boot:$springBootVersion"
+    compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+    compile "org.springframework:spring-core:$springVersion"
+    compile "org.springframework:spring-tx:$springVersion"
+    compile "org.springframework:spring-aop:$springVersion"
+    compile "org.springframework:spring-context:$springVersion"
+    compile "org.springframework:spring-messaging:$springVersion"
+
+    compile group: 'org.springframework.ws', name: 'spring-ws', version: "3.0.3.RELEASE"
+    compile group: 'org.springframework.ws', name: 'spring-ws-core', version: "3.0.3.RELEASE"
+    compile group: 'org.springframework.ws', name: 'spring-ws-security', version: "3.0.3.RELEASE"
+
+    compile "org.springframework.security:spring-security-core:$springVersion"
+
+    testCompile "org.springframework.boot:spring-boot-test:$springBootVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile "junit:junit:4.12"
+    */
+
+    testCompile group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version:'2.0.3'
+}
+
